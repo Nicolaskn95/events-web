@@ -25,16 +25,25 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover"
 import { EventFormData } from "@/lib/types"
+import { useToast } from "@/hooks/use-toast"
 
 const formSchema = z.object({
-  title: z.string().min(1, "Title is required"),
+  title: z.string().min(3, "O título deve ter pelo menos 3 caracteres."),
   date: z.date({
-    required_error: "Date is required",
+    required_error: "A data é obrigatória",
+    invalid_type_error: "A data deve estar em formato ISO8601",
   }),
-  capacity: z.number().min(1, "Capacity must be at least 1"),
-  ticketPrice: z.number().min(0, "Price cannot be negative"),
-  location: z.string().min(1, "Location is required"),
-  description: z.string().min(1, "Description is required"),
+  capacity: z
+    .number()
+    .int()
+    .min(1, "A capacidade deve ser um número inteiro maior ou igual a 1"),
+  ticketPrice: z
+    .number()
+    .min(0, "O preço do ingresso deve ser um número maior ou igual a 0"),
+  location: z.string().min(1, "A localização não pode ser nulo"),
+  description: z
+    .string()
+    .min(10, "A descrição deve ter pelo menos 10 caracteres."),
 })
 
 interface EventFormProps {
@@ -45,11 +54,12 @@ interface EventFormProps {
 
 export function EventForm({ initialData, onSubmit, onCancel }: EventFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const { toast } = useToast()
 
   const isValidDate = (date: any) => {
     return date && !isNaN(new Date(date).getTime())
   }
-  console.log(initialData)
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: initialData
@@ -70,9 +80,28 @@ export function EventForm({ initialData, onSubmit, onCancel }: EventFormProps) {
   async function handleSubmit(values: z.infer<typeof formSchema>) {
     try {
       setIsSubmitting(true)
-      await onSubmit({
+      const result = await onSubmit({
         ...values,
-        date: values.date.toISOString(),
+        date: values.date.toISOString().split(".")[0] + "Z",
+      })
+
+      // Mostrar toast de sucesso
+      toast({
+        title: "Success",
+        description: initialData
+          ? "Evento editado com sucesso!"
+          : "Evento criado com sucesso!",
+        variant: "default",
+        className: "bg-green-700 text-white border-0",
+        color: "green",
+      })
+    } catch (error) {
+      // Mostrar toast de erro
+      toast({
+        title: "Error",
+        description:
+          "An error occurred while saving the event. Please try again.",
+        variant: "destructive",
       })
     } finally {
       setIsSubmitting(false)

@@ -1,10 +1,15 @@
 import { Event, EventFormData } from "./types"
+export interface ApiResponse {
+  success: boolean
+  data: Event[]
+  count: number
+}
 
 const API_URL = "https://events-api-fatec.vercel.app/api/events"
+const LOCAL = "http://localhost:3001/api/events"
 
 export async function getAllEvents(): Promise<Event[]> {
   const response = await fetch(`${API_URL}`)
-  console.log(response)
   return response.json()
 }
 
@@ -21,6 +26,7 @@ export async function createEvent(event: EventFormData): Promise<Event> {
     },
     body: JSON.stringify(event),
   })
+  console.log(response)
   return response.json()
 }
 
@@ -45,9 +51,10 @@ export async function deleteEvent(id: string): Promise<void> {
   })
 }
 
-export async function searchEvents(query: string): Promise<Event[]> {
+export async function searchEvents(query: string): Promise<ApiResponse> {
   const response = await fetch(
     `${API_URL}/search?q=${encodeURIComponent(query)}`
   )
+  console.log(response)
   return response.json()
 }
