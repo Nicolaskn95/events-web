@@ -91,9 +91,9 @@ export function EventForm({ initialData, onSubmit, onCancel }: EventFormProps) {
         description: initialData
           ? "Evento editado com sucesso!"
           : "Evento criado com sucesso!",
-        variant: "default",
-        className: "bg-green-700 text-white border-0",
-        color: "green",
+        className: initialData
+          ? "bg-blue-400 text-white border-0"
+          : "bg-green-700 text-white border-0",
       })
     } catch (error) {
       // Mostrar toast de erro

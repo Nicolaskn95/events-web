@@ -13,7 +13,7 @@ export default function NewEventPage() {
 
   async function handleSubmit(data: any) {
     try {
-      const result = await createEvent(data)
+      await createEvent(data)
 
       router.push("/")
     } catch (err: any) {
