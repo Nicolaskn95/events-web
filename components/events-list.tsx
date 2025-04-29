@@ -68,7 +68,9 @@ export function EventsList({
       if (hasFilters) {
         // Se houver filtros, usa a busca com parâmetros
         const params = new URLSearchParams()
-        if (searchTerm) params.append("q", searchTerm)
+        searchTerm === undefined
+          ? params.append("q", "undefined")
+          : params.append("q", searchTerm)
         if (startDate) params.append("startDate", startDate)
         if (endDate) params.append("endDate", endDate)
         if (minPrice) params.append("minPrice", minPrice)
