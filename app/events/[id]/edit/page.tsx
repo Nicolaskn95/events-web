@@ -39,7 +39,7 @@ export default function EditEventPage({ params }: { params: { id: string } }) {
   }
 
   if (isLoading) {
-    return <div>Loading...</div>
+    return <div>CARREGANDO...</div>
   }
 
   if (error) {
@@ -53,12 +53,12 @@ export default function EditEventPage({ params }: { params: { id: string } }) {
   }
 
   if (!event) {
-    return <div>Event not found</div>
+    return <div>Evento não encontrado</div>
   }
 
   return (
     <div className="container mx-auto py-10">
-      <h1 className="text-4xl font-bold tracking-tight mb-8">Edit Event</h1>
+      <h1 className="text-4xl font-bold tracking-tight mb-8">Editar Evento</h1>
       <div className="max-w-2xl">
         <EventForm
           initialData={event}

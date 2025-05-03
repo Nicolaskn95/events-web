@@ -26,9 +26,9 @@ export default function NewEventPage() {
       } else {
         // Toast para outros tipos de erro
         toast({
-          title: "Error",
+          title: "Erro",
           description:
-            err.message || "Failed to create event. Please try again.",
+            err.message || "Falha ao criar evento. Por favor, tente novamente.",
           variant: "destructive",
         })
       }
@@ -38,7 +38,7 @@ export default function NewEventPage() {
   return (
     <div className="container mx-auto py-10">
       <h1 className="text-4xl font-bold tracking-tight mb-8">
-        Create New Event
+        Criar Novo Evento
       </h1>
       <div className="max-w-2xl">
         <EventForm onSubmit={handleSubmit} onCancel={() => router.push("/")} />

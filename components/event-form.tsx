@@ -87,7 +87,7 @@ export function EventForm({ initialData, onSubmit, onCancel }: EventFormProps) {
 
       // Mostrar toast de sucesso
       toast({
-        title: "Success",
+        title: "Sucesso!",
         description: initialData
           ? "Evento editado com sucesso!"
           : "Evento criado com sucesso!",
@@ -98,9 +98,9 @@ export function EventForm({ initialData, onSubmit, onCancel }: EventFormProps) {
     } catch (error) {
       // Mostrar toast de erro
       toast({
-        title: "Error",
+        title: "Erro",
         description:
-          "An error occurred while saving the event. Please try again.",
+          "Ocorreu um erro ao salvar o evento. Por favor, tente novamente.",
         variant: "destructive",
       })
     } finally {
@@ -116,9 +116,9 @@ export function EventForm({ initialData, onSubmit, onCancel }: EventFormProps) {
           name="title"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Title</FormLabel>
+              <FormLabel>Título</FormLabel>
               <FormControl>
-                <Input placeholder="Event title" {...field} />
+                <Input placeholder="Título do evento" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -130,10 +130,10 @@ export function EventForm({ initialData, onSubmit, onCancel }: EventFormProps) {
           name="date"
           render={({ field }) => (
             <FormItem className="flex flex-col">
-              <FormLabel>Date</FormLabel>
+              <FormLabel>Data e Hora</FormLabel>
               <Popover>
-                <PopoverTrigger asChild>
-                  <FormControl>
+                <FormControl>
+                  <PopoverTrigger asChild>
                     <Button
                       variant={"outline"}
                       className={cn(
@@ -142,24 +142,46 @@ export function EventForm({ initialData, onSubmit, onCancel }: EventFormProps) {
                       )}
                     >
                       {isValidDate(field.value) ? (
-                        format(new Date(field.value), "PPP")
+                        format(new Date(field.value), "PPPp")
                       ) : (
-                        <span>Pick a date</span>
+                        <span>Escolha uma data e hora</span>
                       )}
                       <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
                     </Button>
-                  </FormControl>
-                </PopoverTrigger>
+                  </PopoverTrigger>
+                </FormControl>
                 <PopoverContent className="w-auto p-0" align="start">
                   <Calendar
                     mode="single"
                     selected={field.value}
-                    onSelect={field.onChange}
+                    onSelect={(date) => {
+                      const currentDate = field.value || new Date()
+                      const updatedDate = date ? new Date(date) : new Date()
+                      updatedDate.setHours(
+                        currentDate.getHours(),
+                        currentDate.getMinutes()
+                      )
+                      field.onChange(updatedDate)
+                    }}
                     disabled={(date) =>
                       date < new Date(new Date().setHours(0, 0, 0, 0))
                     }
                     initialFocus
                   />
+                  <div className="mt-2 flex items-center space-x-2">
+                    <Input
+                      type="time"
+                      value={format(new Date(field.value), "HH:mm")}
+                      onChange={(e) => {
+                        const [hours, minutes] = e.target.value
+                          .split(":")
+                          .map(Number)
+                        const updatedDate = new Date(field.value)
+                        updatedDate.setHours(hours, minutes)
+                        field.onChange(updatedDate)
+                      }}
+                    />
+                  </div>
                 </PopoverContent>
               </Popover>
               <FormMessage />
@@ -173,7 +195,7 @@ export function EventForm({ initialData, onSubmit, onCancel }: EventFormProps) {
             name="capacity"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Capacity</FormLabel>
+                <FormLabel>Capacidade</FormLabel>
                 <FormControl>
                   <Input
                     type="number"
@@ -192,7 +214,7 @@ export function EventForm({ initialData, onSubmit, onCancel }: EventFormProps) {
             name="ticketPrice"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Ticket Price</FormLabel>
+                <FormLabel>Preço do Ingresso</FormLabel>
                 <FormControl>
                   <Input
                     type="number"
@@ -213,9 +235,9 @@ export function EventForm({ initialData, onSubmit, onCancel }: EventFormProps) {
           name="location"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Location</FormLabel>
+              <FormLabel>Localização</FormLabel>
               <FormControl>
-                <Input placeholder="Event location" {...field} />
+                <Input placeholder="Local do evento" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -227,10 +249,10 @@ export function EventForm({ initialData, onSubmit, onCancel }: EventFormProps) {
           name="description"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Description</FormLabel>
+              <FormLabel>Descrição</FormLabel>
               <FormControl>
                 <Textarea
-                  placeholder="Event description"
+                  placeholder="Descrição do evento"
                   className="resize-none"
                   {...field}
                 />
@@ -247,10 +269,10 @@ export function EventForm({ initialData, onSubmit, onCancel }: EventFormProps) {
             onClick={onCancel}
             disabled={isSubmitting}
           >
-            Cancel
+            Cancelar
           </Button>
           <Button type="submit" disabled={isSubmitting}>
-            {isSubmitting ? "Saving..." : "Save Event"}
+            {isSubmitting ? "Salvando..." : "Salvar Evento"}
           </Button>
         </div>
       </form>

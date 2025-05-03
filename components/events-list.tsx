@@ -10,11 +10,9 @@ import Link from "next/link"
 import {
   Calendar,
   MapPin,
-  Users,
   DollarSign,
   Pencil,
   Trash2,
-  Ticket,
   Clock,
 } from "lucide-react"
 import {
@@ -29,7 +27,6 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
 import { Skeleton } from "@/components/ui/skeleton"
-import { Badge } from "@/components/ui/badge"
 import { useToast } from "@/hooks/use-toast"
 
 interface EventsListProps {
@@ -84,8 +81,8 @@ export function EventsList({
         setEvents(Array.isArray(data) ? data : [])
       }
     } catch (error) {
-      console.error("Failed to load events:", error)
-      setError("Failed to load events. Please try again.")
+      console.error("Falha ao carregar eventos:", error)
+      setError("Falha ao carregar eventos. Por favor, tente novamente.")
       setEvents([])
     } finally {
       setIsLoading(false)
@@ -141,7 +138,7 @@ export function EventsList({
       <div className="flex flex-col items-center justify-center p-8 text-center">
         <p className="text-destructive mb-4">{error}</p>
         <Button variant="outline" onClick={loadEvents}>
-          Retry
+          Tente Novamente
         </Button>
       </div>
     )
@@ -195,12 +192,12 @@ export function EventsList({
                       </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
-                      <AlertDialogCancel>Cancel</AlertDialogCancel>
+                      <AlertDialogCancel>Cancelar</AlertDialogCancel>
                       <AlertDialogAction
                         onClick={() => handleDelete(event._id)}
                         className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                       >
-                        Delete
+                        Deletar
                       </AlertDialogAction>
                     </AlertDialogFooter>
                   </AlertDialogContent>
@@ -239,7 +236,7 @@ export function EventsList({
                     (new Date(event.date).getTime() - Date.now()) /
                       (1000 * 60 * 60 * 24)
                   )}{" "}
-                  days remaining
+                  Dias faltantes
                 </span>
               </div>
             )}
