@@ -111,11 +111,15 @@ export default function Home() {
           <div className="flex gap-2 items-end">
             <div>
               <Label>Data Inicial</Label>
-
               <Input
                 type="date"
-                value={startDate}
-                onChange={(e) => setStartDate(e.target.value)}
+                value={startDate.split("T")[0] || ""}
+                onChange={(e) =>
+                  setStartDate(
+                    (prev) =>
+                      `${e.target.value}T${prev.split("T")[1] || "00:00"}`
+                  )
+                }
                 className="w-[150px]"
               />
             </div>
@@ -126,6 +130,19 @@ export default function Home() {
                 type="date"
                 value={endDate}
                 onChange={(e) => setEndDate(e.target.value)}
+                className="w-[150px]"
+              />
+            </div>
+            <div>
+              <Label>Hora</Label>
+              <Input
+                type="time"
+                value={startDate.split("T")[1] || ""}
+                onChange={(e) =>
+                  setStartDate(
+                    (prev) => `${prev.split("T")[0] || ""}T${e.target.value}`
+                  )
+                }
                 className="w-[150px]"
               />
             </div>

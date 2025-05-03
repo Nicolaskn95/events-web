@@ -148,11 +148,11 @@ export function EventsList({
     return (
       <div className="flex flex-col items-center justify-center p-8 text-center">
         <p className="text-muted-foreground mb-4">
-          No events found matching your criteria
+          Nenhum evento encontrado que corresponda aos seus critérios
         </p>
         {searchTerm || startDate || endDate || minPrice || maxPrice || (
           <Button variant="outline" onClick={() => window.location.reload()}>
-            Clear filters
+            Limpar Filtro
           </Button>
         )}
       </div>
