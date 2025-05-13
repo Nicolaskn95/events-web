@@ -6,13 +6,21 @@ import Link from "next/link"
 import { PlusCircle } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { toast, useToast } from "@/hooks/use-toast"
-import { ToastAction } from "@/components/ui/toast"
+import { useToast } from "@/hooks/use-toast"
+
 export default function Home() {
   const { toast } = useToast()
+  const dateNow = new Date()
+
   const [searchTerm, setSearchTerm] = useState("")
-  const [startDate, setStartDate] = useState("")
+  const [startDate, setStartDate] = useState(
+    dateNow.toISOString().split("T")[0]
+  )
+  const [startTime, setStartTime] = useState(
+    dateNow.getHours() + ":" + dateNow.getMinutes().toString().padStart(2, "0")
+  )
   const [endDate, setEndDate] = useState("")
+  const [endTime, setEndTime] = useState("")
   const [minPrice, setMinPrice] = useState("")
   const [maxPrice, setMaxPrice] = useState("")
 
@@ -25,19 +33,47 @@ export default function Home() {
   })
 
   const handleSearch = () => {
+    const startDateTime =
+      startDate && startTime ? `${startDate}T${startTime}` : startDate
+    let endDateTime = endDate && endTime ? `${endDate}T${endTime}` : endDate
+
+    if (endDate != "" && endTime == "") {
+      setEndTime("23:59")
+      endDateTime = `${endDate}T23:59`
+    }
+
+    if (endDate != "") {
+      console.log("endDateTime", endDateTime)
+      if (Date.parse(endDateTime) < Date.parse(startDateTime)) {
+        toast({
+          title: "Erro",
+          description: "A data final não pode ser anterior à data inicial.",
+          variant: "destructive",
+        })
+        return
+      }
+    }
+
     setActiveFilters({
       searchTerm,
-      startDate,
-      endDate,
+      startDate: startDateTime,
+      endDate: endDateTime != "" ? endDateTime : "",
       minPrice,
       maxPrice,
     })
   }
 
   const resetFilters = () => {
+    const dateNowReset = new Date()
     setSearchTerm("")
-    setStartDate("")
+    setStartDate(dateNowReset.toISOString().split("T")[0])
+    setStartTime(
+      dateNow.getHours() +
+        ":" +
+        dateNow.getMinutes().toString().padStart(2, "0")
+    )
     setEndDate("")
+    setEndTime("")
     setMinPrice("")
     setMaxPrice("")
     setActiveFilters({
@@ -113,13 +149,18 @@ export default function Home() {
               <Label>Data Inicial</Label>
               <Input
                 type="date"
-                value={startDate.split("T")[0] || ""}
-                onChange={(e) =>
-                  setStartDate(
-                    (prev) =>
-                      `${e.target.value}T${prev.split("T")[1] || "00:00"}`
-                  )
-                }
+                value={startDate}
+                onChange={(e) => setStartDate(e.target.value)}
+                className="w-[150px]"
+              />
+            </div>
+
+            <div>
+              <Label>Hora Inicial</Label>
+              <Input
+                type="time"
+                value={startTime}
+                onChange={(e) => setStartTime(e.target.value)}
                 className="w-[150px]"
               />
             </div>
@@ -133,16 +174,13 @@ export default function Home() {
                 className="w-[150px]"
               />
             </div>
+
             <div>
-              <Label>Hora</Label>
+              <Label>Hora Final</Label>
               <Input
                 type="time"
-                value={startDate.split("T")[1] || ""}
-                onChange={(e) =>
-                  setStartDate(
-                    (prev) => `${prev.split("T")[0] || ""}T${e.target.value}`
-                  )
-                }
+                value={endTime}
+                onChange={(e) => setEndTime(e.target.value)}
                 className="w-[150px]"
               />
             </div>

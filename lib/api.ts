@@ -9,17 +9,17 @@ const API_URL = "https://events-api-fatec.vercel.app/api/events"
 const LOCAL = "http://localhost:3001/api/events"
 
 export async function getAllEvents(): Promise<Event[]> {
-  const response = await fetch(`${API_URL}`)
+  const response = await fetch(`${LOCAL}`)
   return response.json()
 }
 
 export async function getEventById(id: string): Promise<Event> {
-  const response = await fetch(`${API_URL}/${id}`)
+  const response = await fetch(`${LOCAL}/${id}`)
   return response.json()
 }
 
 export async function createEvent(event: EventFormData): Promise<Event> {
-  const response = await fetch(API_URL, {
+  const response = await fetch(LOCAL, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -34,7 +34,7 @@ export async function updateEvent(
   id: string,
   event: EventFormData
 ): Promise<Event> {
-  const response = await fetch(`${API_URL}/${id}`, {
+  const response = await fetch(`${LOCAL}/${id}`, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
@@ -46,15 +46,13 @@ export async function updateEvent(
 
 export async function deleteEvent(id: string): Promise<void> {
   console.log(id)
-  await fetch(`${API_URL}/${id}`, {
+  await fetch(`${LOCAL}/${id}`, {
     method: "DELETE",
   })
 }
 
 export async function searchEvents(query: string): Promise<ApiResponse> {
-  const response = await fetch(
-    `${API_URL}/search?q=${encodeURIComponent(query)}`
-  )
+  const response = await fetch(`${LOCAL}/search?q=${encodeURIComponent(query)}`)
   console.log(response)
   return response.json()
 }
