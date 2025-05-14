@@ -1,28 +1,29 @@
-"use client"
-import { Suspense, use, useState } from "react"
-import { EventsList } from "@/components/events-list"
-import { Button } from "@/components/ui/button"
-import Link from "next/link"
-import { PlusCircle } from "lucide-react"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { useToast } from "@/hooks/use-toast"
+"use client";
+import { Suspense, use, useState } from "react";
+import { EventsList } from "@/components/events-list";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
+import { PlusCircle } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { useToast } from "@/hooks/use-toast";
+import { UserMenu } from "@/components/UserMenu";
 
 export default function Home() {
-  const { toast } = useToast()
-  const dateNow = new Date()
+  const { toast } = useToast();
+  const dateNow = new Date();
 
-  const [searchTerm, setSearchTerm] = useState("")
+  const [searchTerm, setSearchTerm] = useState("");
   const [startDate, setStartDate] = useState(
     dateNow.toISOString().split("T")[0]
-  )
+  );
   const [startTime, setStartTime] = useState(
     dateNow.getHours() + ":" + dateNow.getMinutes().toString().padStart(2, "0")
-  )
-  const [endDate, setEndDate] = useState("")
-  const [endTime, setEndTime] = useState("")
-  const [minPrice, setMinPrice] = useState("")
-  const [maxPrice, setMaxPrice] = useState("")
+  );
+  const [endDate, setEndDate] = useState("");
+  const [endTime, setEndTime] = useState("");
+  const [minPrice, setMinPrice] = useState("");
+  const [maxPrice, setMaxPrice] = useState("");
 
   const [activeFilters, setActiveFilters] = useState({
     searchTerm: "",
@@ -30,27 +31,27 @@ export default function Home() {
     endDate: "",
     minPrice: "",
     maxPrice: "",
-  })
+  });
 
   const handleSearch = () => {
     const startDateTime =
-      startDate && startTime ? `${startDate}T${startTime}` : startDate
-    let endDateTime = endDate && endTime ? `${endDate}T${endTime}` : endDate
+      startDate && startTime ? `${startDate}T${startTime}` : startDate;
+    let endDateTime = endDate && endTime ? `${endDate}T${endTime}` : endDate;
 
     if (endDate != "" && endTime == "") {
-      setEndTime("23:59")
-      endDateTime = `${endDate}T23:59`
+      setEndTime("23:59");
+      endDateTime = `${endDate}T23:59`;
     }
 
     if (endDate != "") {
-      console.log("endDateTime", endDateTime)
+      console.log("endDateTime", endDateTime);
       if (Date.parse(endDateTime) < Date.parse(startDateTime)) {
         toast({
           title: "Erro",
           description: "A data final não pode ser anterior à data inicial.",
           variant: "destructive",
-        })
-        return
+        });
+        return;
       }
     }
 
@@ -60,35 +61,36 @@ export default function Home() {
       endDate: endDateTime != "" ? endDateTime : "",
       minPrice,
       maxPrice,
-    })
-  }
+    });
+  };
 
   const resetFilters = () => {
-    const dateNowReset = new Date()
-    setSearchTerm("")
-    setStartDate(dateNowReset.toISOString().split("T")[0])
+    const dateNowReset = new Date();
+    setSearchTerm("");
+    setStartDate(dateNowReset.toISOString().split("T")[0]);
     setStartTime(
       dateNow.getHours() +
         ":" +
         dateNow.getMinutes().toString().padStart(2, "0")
-    )
-    setEndDate("")
-    setEndTime("")
-    setMinPrice("")
-    setMaxPrice("")
+    );
+    setEndDate("");
+    setEndTime("");
+    setMinPrice("");
+    setMaxPrice("");
     setActiveFilters({
       searchTerm: "",
       startDate: "",
       endDate: "",
       minPrice: "",
       maxPrice: "",
-    })
-  }
+    });
+  };
 
   return (
     <div className="container mx-auto py-10">
       <div className="flex justify-between items-center mb-8">
         <h1 className="text-4xl font-bold tracking-tight">Eventos</h1>
+        <UserMenu />
         <Link href="/events/new">
           <Button>
             <PlusCircle className="mr-2 h-4 w-4" />
@@ -118,9 +120,9 @@ export default function Home() {
                 placeholder="Min"
                 value={minPrice}
                 onChange={(e) => {
-                  const value = e.target.value
+                  const value = e.target.value;
                   if (value === "" || Number(value) >= 0) {
-                    setMinPrice(value)
+                    setMinPrice(value);
                   }
                 }}
                 className="w-[100px]"
@@ -134,9 +136,9 @@ export default function Home() {
                 placeholder="Max"
                 value={maxPrice}
                 onChange={(e) => {
-                  const value = e.target.value
+                  const value = e.target.value;
                   if (value === "" || Number(value) >= 0) {
-                    setMaxPrice(value)
+                    setMaxPrice(value);
                   }
                 }}
                 className="w-[100px]"
@@ -199,5 +201,5 @@ export default function Home() {
         <EventsList {...activeFilters} />
       </Suspense>
     </div>
-  )
+  );
 }
