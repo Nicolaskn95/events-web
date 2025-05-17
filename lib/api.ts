@@ -1,15 +1,12 @@
 import { Event, EventFormData } from "./types";
 import Cookies from "js-cookie";
+import { config } from "./config";
 
 export interface ApiResponse {
   success: boolean;
   data: Event[];
   count: number;
 }
-
-const API_URL = "https://events-api-fatec.vercel.app/api/events";
-const LOCAL = "http://localhost:3001/api/events";
-
 // Função para obter os headers com o token de autenticação
 const getAuthHeaders = () => {
   const token = Cookies.get("token");
@@ -20,21 +17,21 @@ const getAuthHeaders = () => {
 };
 
 export async function getAllEvents(): Promise<Event[]> {
-  const response = await fetch(`${LOCAL}`, {
+  const response = await fetch(`${config.apiUrl}/api/events`, {
     headers: getAuthHeaders(),
   });
   return response.json();
 }
 
 export async function getEventById(id: string): Promise<Event> {
-  const response = await fetch(`${LOCAL}/${id}`, {
+  const response = await fetch(`${config.apiUrl}/${id}`, {
     headers: getAuthHeaders(),
   });
   return response.json();
 }
 
 export async function createEvent(event: EventFormData): Promise<Event> {
-  const response = await fetch(LOCAL, {
+  const response = await fetch(config.apiUrl, {
     method: "POST",
     headers: getAuthHeaders(),
     body: JSON.stringify(event),
@@ -47,7 +44,7 @@ export async function updateEvent(
   id: string,
   event: EventFormData
 ): Promise<Event> {
-  const response = await fetch(`${LOCAL}/${id}`, {
+  const response = await fetch(`${config.apiUrl}/${id}`, {
     method: "PUT",
     headers: getAuthHeaders(),
     body: JSON.stringify(event),
@@ -57,7 +54,7 @@ export async function updateEvent(
 
 export async function deleteEvent(id: string): Promise<void> {
   console.log(id);
-  await fetch(`${LOCAL}/${id}`, {
+  await fetch(`${config.apiUrl}/${id}`, {
     method: "DELETE",
     headers: getAuthHeaders(),
   });
@@ -65,7 +62,7 @@ export async function deleteEvent(id: string): Promise<void> {
 
 export async function searchEvents(query: string): Promise<ApiResponse> {
   const response = await fetch(
-    `${LOCAL}/search?q=${encodeURIComponent(query)}`,
+    `${config.apiUrl}/search?q=${encodeURIComponent(query)}`,
     {
       headers: getAuthHeaders(),
     }

@@ -15,6 +15,7 @@ import {
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import Cookies from "js-cookie";
+import { config } from "@/lib/config";
 
 export default function LoginPage() {
   const [isLogin, setIsLogin] = useState(true);
@@ -32,7 +33,7 @@ export default function LoginPage() {
 
     try {
       if (isLogin) {
-        const response = await fetch("http://localhost:3001/api/users/login", {
+        const response = await fetch(`${config.apiUrl}/api/users/login`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -43,7 +44,7 @@ export default function LoginPage() {
         const data = await response.json();
 
         if (!response.ok) {
-          throw new Error(data.errors[0].msg || "Credenciais inválidas");
+          throw new Error(data.error?.[0]?.msg || "Credenciais inválidas");
         }
 
         // Salvar o token JWT nos cookies
@@ -71,21 +72,18 @@ export default function LoginPage() {
           return;
         }
 
-        const response = await fetch(
-          "http://localhost:3001/api/users/register",
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ name, email, password }),
-          }
-        );
+        const response = await fetch(`${config.apiUrl}/api/users/register`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ name, email, password }),
+        });
 
         const data = await response.json();
 
         if (!response.ok) {
-          throw new Error(data.errors[0].msg || "Erro ao criar conta");
+          throw new Error(data.error[0].msg || "Erro ao criar conta");
         }
 
         toast({

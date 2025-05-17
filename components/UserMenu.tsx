@@ -8,7 +8,6 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-  DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 import {
   Dialog,
@@ -23,7 +22,6 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import Cookies from "js-cookie";
 import Image from "next/image";
-import { jwtDecode } from "jwt-decode";
 import { User } from "lucide-react";
 
 interface UserData {
@@ -37,6 +35,7 @@ export function UserMenu() {
   const [isEditing, setIsEditing] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [showEditButtons, setShowEditButtons] = useState(false);
   const [userData, setUserData] = useState<UserData>({
     name: "",
     email: "",
@@ -149,6 +148,14 @@ export function UserMenu() {
     }
   };
 
+  const handleEditClick = () => {
+    setIsEditing(true);
+    setShowEditButtons(false);
+    setTimeout(() => {
+      setShowEditButtons(true);
+    }, 100);
+  };
+
   return (
     <>
       <DropdownMenu>
@@ -167,13 +174,6 @@ export function UserMenu() {
             Gerenciar conta
           </DropdownMenuItem>
           <DropdownMenuItem onClick={handleLogout}>Sair</DropdownMenuItem>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem
-            onClick={() => setIsDeleteDialogOpen(true)}
-            className="text-red-600 focus:text-red-600 focus:bg-red-100"
-          >
-            Excluir conta
-          </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
 
@@ -184,7 +184,7 @@ export function UserMenu() {
             <DialogDescription>Faça alterações em seu perfil</DialogDescription>
           </DialogHeader>
           <form onSubmit={handleUpdateProfile}>
-            <div className="grid gap-4 py-4">
+            <div className="flex flex-col gap-4 py-4">
               <div className="flex justify-center mb-4">
                 <div className="relative w-24 h-24 rounded-full overflow-hidden">
                   {userData?.avatar ? (
@@ -199,8 +199,8 @@ export function UserMenu() {
                   )}
                 </div>
               </div>
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="name" className="text-right">
+              <div className="flex items-center gap-4">
+                <Label htmlFor="name" className="w-1/4 text-right">
                   Nome
                 </Label>
                 <Input
@@ -210,11 +210,11 @@ export function UserMenu() {
                     setUserData({ ...userData, name: e.target.value })
                   }
                   disabled={!isEditing}
-                  className="col-span-3"
+                  className="w-3/4"
                 />
               </div>
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="email" className="text-right">
+              <div className="flex items-center gap-4">
+                <Label htmlFor="email" className="w-1/4 text-right">
                   Email
                 </Label>
                 <Input
@@ -225,34 +225,53 @@ export function UserMenu() {
                     setUserData({ ...userData, email: e.target.value })
                   }
                   disabled={!isEditing}
-                  className="col-span-3"
+                  className="w-3/4"
                 />
               </div>
             </div>
             <DialogFooter className="flex flex-col space-y-2">
               {isEditing ? (
-                <>
-                  <Button type="submit" className="w-full" disabled={isLoading}>
-                    {isLoading ? "Salvando..." : "Salvar alterações"}
+                showEditButtons ? (
+                  <div className="flex flex-row gap-2 w-full">
+                    <Button
+                      type="submit"
+                      className="w-full"
+                      disabled={isLoading}
+                    >
+                      {isLoading ? "Salvando..." : "Salvar alterações"}
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className="w-full"
+                      onClick={() => {
+                        setIsEditing(false);
+                        setShowEditButtons(false);
+                      }}
+                      disabled={isLoading}
+                    >
+                      Cancelar
+                    </Button>
+                  </div>
+                ) : null
+              ) : (
+                <div className="flex flex-col gap-2 w-full">
+                  <Button
+                    type="button"
+                    className="w-full"
+                    onClick={handleEditClick}
+                  >
+                    Editar perfil
                   </Button>
                   <Button
                     type="button"
-                    variant="outline"
+                    variant="destructive"
                     className="w-full"
-                    onClick={() => setIsEditing(false)}
-                    disabled={isLoading}
+                    onClick={() => setIsDeleteDialogOpen(true)}
                   >
-                    Cancelar
+                    Excluir conta
                   </Button>
-                </>
-              ) : (
-                <Button
-                  type="button"
-                  className="w-full"
-                  onClick={() => setIsEditing(true)}
-                >
-                  Editar perfil
-                </Button>
+                </div>
               )}
             </DialogFooter>
           </form>
