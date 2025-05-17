@@ -23,6 +23,7 @@ import { useToast } from "@/hooks/use-toast";
 import Cookies from "js-cookie";
 import Image from "next/image";
 import { User } from "lucide-react";
+import { config } from "@/lib/config";
 
 interface UserData {
   name: string;
@@ -48,7 +49,7 @@ export function UserMenu() {
       const token = Cookies.get("token");
       if (token) {
         try {
-          const response = await fetch("http://localhost:3001/api/users", {
+          const response = await fetch(`${config.apiUrl}/api/users`, {
             headers: {
               "access-token": token,
             },
@@ -85,7 +86,7 @@ export function UserMenu() {
     setIsLoading(true);
 
     try {
-      const response = await fetch("http://localhost:3001/api/users", {
+      const response = await fetch(`${config.apiUrl}/api/users`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -119,7 +120,7 @@ export function UserMenu() {
     setIsLoading(true);
 
     try {
-      const response = await fetch("http://localhost:3001/api/users", {
+      const response = await fetch(`${config.apiUrl}/api/users`, {
         method: "DELETE",
         headers: {
           "access-token": Cookies.get("token") || "",

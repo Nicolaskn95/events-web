@@ -1,6 +1,6 @@
 import { Event, EventFormData } from "./types";
 import Cookies from "js-cookie";
-import { config } from "./config";
+import { config } from "@/lib/config";
 
 export interface ApiResponse {
   success: boolean;
