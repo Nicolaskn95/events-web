@@ -12,7 +12,7 @@ const getAuthHeaders = () => {
   const token = Cookies.get("token");
   return {
     "Content-Type": "application/json",
-    ...(token ? { "access-token": token } : {}),
+    ...(token ? { access_token: token } : {}),
   };
 };
 
