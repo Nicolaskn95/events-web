@@ -44,7 +44,7 @@ export default function LoginPage() {
         const data = await response.json();
 
         if (!response.ok) {
-          throw new Error(data.error?.[0]?.msg || "Credenciais inválidas");
+          throw new Error(data.errors?.[0]?.msg || "Credenciais inválidas");
         }
 
         // Salvar o token JWT nos cookies
@@ -83,7 +83,7 @@ export default function LoginPage() {
         const data = await response.json();
 
         if (!response.ok) {
-          throw new Error(data.error[0].msg || "Erro ao criar conta");
+          throw new Error(data.errors[0].msg || "Erro ao criar conta");
         }
 
         toast({

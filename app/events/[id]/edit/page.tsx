@@ -1,45 +1,45 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { useRouter } from "next/navigation"
-import { EventForm } from "@/components/event-form"
-import { getEventById, updateEvent } from "@/lib/api"
-import { Event, EventFormData } from "@/lib/types"
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { EventForm } from "@/components/event-form";
+import { getEventById, updateEvent } from "@/lib/api";
+import { Event, EventFormData } from "@/lib/types";
 
 export default function EditEventPage({ params }: { params: { id: string } }) {
-  const router = useRouter()
-  const [event, setEvent] = useState<Event | null>(null)
-  const [error, setError] = useState("")
-  const [isLoading, setIsLoading] = useState(true)
+  const router = useRouter();
+  const [event, setEvent] = useState<Event | null>(null);
+  const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     async function loadEvent() {
       try {
-        const data = await getEventById(params.id)
-        console.log(data)
-        setEvent(data)
+        const data = await getEventById(params.id);
+
+        setEvent(data);
       } catch (err) {
-        setError("Failed to load event.")
-        console.error(err)
+        setError("Failed to load event.");
+        console.error(err);
       } finally {
-        setIsLoading(false)
+        setIsLoading(false);
       }
     }
-    loadEvent()
-  }, [params.id])
+    loadEvent();
+  }, [params.id]);
 
   async function handleSubmit(data: EventFormData) {
     try {
-      await updateEvent(params.id, data)
-      router.push("/")
+      await updateEvent(params.id, data);
+      router.push("/");
     } catch (err) {
-      setError("Failed to update event. Please try again.")
-      console.error(err)
+      setError("Failed to update event. Please try again.");
+      console.error(err);
     }
   }
 
   if (isLoading) {
-    return <div>CARREGANDO...</div>
+    return <div>CARREGANDO...</div>;
   }
 
   if (error) {
@@ -49,11 +49,11 @@ export default function EditEventPage({ params }: { params: { id: string } }) {
           {error}
         </div>
       </div>
-    )
+    );
   }
 
   if (!event) {
-    return <div>Evento não encontrado</div>
+    return <div>Evento não encontrado</div>;
   }
 
   return (
@@ -67,5 +67,5 @@ export default function EditEventPage({ params }: { params: { id: string } }) {
         />
       </div>
     </div>
-  )
+  );
 }

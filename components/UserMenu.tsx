@@ -7,6 +7,8 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
@@ -24,6 +26,7 @@ import Cookies from "js-cookie";
 import Image from "next/image";
 import { User } from "lucide-react";
 import { config } from "@/lib/config";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 
 interface UserData {
   name: string;
@@ -33,7 +36,7 @@ interface UserData {
 
 export function UserMenu() {
   const [isOpen, setIsOpen] = useState(false);
-  const [isEditing, setIsEditing] = useState(false);
+  const [isEditOpen, setIsEditOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [showEditButtons, setShowEditButtons] = useState(false);
@@ -51,10 +54,10 @@ export function UserMenu() {
         try {
           const response = await fetch(`${config.apiUrl}/api/users`, {
             headers: {
-              "access-token": token,
+              access_token: token,
             },
           });
-          console.log(response);
+
           if (response.ok) {
             const data = await response.json();
             setUserData(data.user);
@@ -83,36 +86,21 @@ export function UserMenu() {
 
   const handleUpdateProfile = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
+    if (!userData) return;
+
+    const updatedUserData = {
+      ...userData,
+      avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(
+        userData.name
+      )}&background=random`,
+    };
 
     try {
-      const response = await fetch(`${config.apiUrl}/api/users`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          "access-token": Cookies.get("token") || "",
-        },
-        body: JSON.stringify(userData),
-      });
-
-      if (!response.ok) {
-        throw new Error("Erro ao atualizar perfil");
-      }
-
-      toast({
-        title: "Sucesso",
-        description: "Perfil atualizado com sucesso!",
-      });
-      setIsEditing(false);
-      setIsOpen(false); // Fechar o modal após atualização bem-sucedida
+      await handleUpdateUser(updatedUserData);
+      setUserData(updatedUserData);
+      setIsEditOpen(false);
     } catch (error) {
-      toast({
-        variant: "destructive",
-        title: "Erro",
-        description: "Não foi possível atualizar seu perfil",
-      });
-    } finally {
-      setIsLoading(false);
+      console.error("Erro ao atualizar perfil:", error);
     }
   };
 
@@ -123,7 +111,7 @@ export function UserMenu() {
       const response = await fetch(`${config.apiUrl}/api/users`, {
         method: "DELETE",
         headers: {
-          "access-token": Cookies.get("token") || "",
+          access_token: Cookies.get("token") || "",
         },
       });
 
@@ -150,38 +138,87 @@ export function UserMenu() {
   };
 
   const handleEditClick = () => {
-    setIsEditing(true);
+    setIsEditOpen(true);
     setShowEditButtons(false);
     setTimeout(() => {
       setShowEditButtons(true);
     }, 100);
   };
 
+  const handleUpdateUser = async (data: UserData) => {
+    setIsLoading(true);
+    try {
+      const response = await fetch(`${config.apiUrl}/api/users`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          access_token: Cookies.get("token") || "",
+        },
+        body: JSON.stringify(data),
+      });
+
+      if (!response.ok) {
+        throw new Error("Erro ao atualizar perfil");
+      }
+
+      toast({
+        title: "Successo",
+        description: "Perfil atualizado com sucesso!",
+      });
+      setIsOpen(false);
+    } catch (error) {
+      toast({
+        title: "Erro",
+        description: "Falha ao atualizar o perfil. Tente novamente.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <>
-      <DropdownMenu>
+      <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
         <DropdownMenuTrigger asChild>
-          <Button
-            variant="default"
-            size="icon"
-            className="relative h-8 w-8"
-            title="Configurações"
-          >
-            <User className="h-5 w-5" />
+          <Button variant="ghost" className="relative h-8 w-8 rounded-full">
+            <Avatar className="h-8 w-8">
+              {isLoading ? (
+                <div className="h-8 w-8 flex items-center justify-center">
+                  <span className="text-xs">Loading...</span>
+                </div>
+              ) : (
+                <>
+                  <AvatarImage src={userData?.avatar} alt={userData?.name} />
+                  <AvatarFallback>{userData?.name?.charAt(0)}</AvatarFallback>
+                </>
+              )}
+            </Avatar>
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="end">
-          <DropdownMenuItem onClick={() => setIsOpen(true)}>
-            Gerenciar conta
+        <DropdownMenuContent className="w-56" align="end" forceMount>
+          <DropdownMenuLabel className="font-normal">
+            <div className="flex flex-col space-y-1">
+              <p className="text-sm font-medium leading-none">
+                {userData?.name}
+              </p>
+              <p className="text-xs leading-none text-muted-foreground">
+                {userData?.email}
+              </p>
+            </div>
+          </DropdownMenuLabel>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem onClick={() => setIsEditOpen(true)}>
+            Editar Perfil
           </DropdownMenuItem>
-          <DropdownMenuItem onClick={handleLogout}>Sair</DropdownMenuItem>
+          <DropdownMenuItem onClick={handleLogout}>Logout</DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
 
-      <Dialog open={isOpen} onOpenChange={setIsOpen}>
+      <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
-            <DialogTitle>Gerenciar Conta</DialogTitle>
+            <DialogTitle>Editar Perfil</DialogTitle>
             <DialogDescription>Faça alterações em seu perfil</DialogDescription>
           </DialogHeader>
           <form onSubmit={handleUpdateProfile}>
@@ -210,7 +247,6 @@ export function UserMenu() {
                   onChange={(e) =>
                     setUserData({ ...userData, name: e.target.value })
                   }
-                  disabled={!isEditing}
                   className="w-3/4"
                 />
               </div>
@@ -225,55 +261,22 @@ export function UserMenu() {
                   onChange={(e) =>
                     setUserData({ ...userData, email: e.target.value })
                   }
-                  disabled={!isEditing}
                   className="w-3/4"
                 />
               </div>
             </div>
-            <DialogFooter className="flex flex-col space-y-2">
-              {isEditing ? (
-                showEditButtons ? (
-                  <div className="flex flex-row gap-2 w-full">
-                    <Button
-                      type="submit"
-                      className="w-full"
-                      disabled={isLoading}
-                    >
-                      {isLoading ? "Salvando..." : "Salvar alterações"}
-                    </Button>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      className="w-full"
-                      onClick={() => {
-                        setIsEditing(false);
-                        setShowEditButtons(false);
-                      }}
-                      disabled={isLoading}
-                    >
-                      Cancelar
-                    </Button>
-                  </div>
-                ) : null
-              ) : (
-                <div className="flex flex-col gap-2 w-full">
-                  <Button
-                    type="button"
-                    className="w-full"
-                    onClick={handleEditClick}
-                  >
-                    Editar perfil
-                  </Button>
-                  <Button
-                    type="button"
-                    variant="destructive"
-                    className="w-full"
-                    onClick={() => setIsDeleteDialogOpen(true)}
-                  >
-                    Excluir conta
-                  </Button>
-                </div>
-              )}
+            <DialogFooter>
+              <Button type="submit" disabled={isLoading}>
+                {isLoading ? "Salvando..." : "Salvar alterações"}
+              </Button>
+              <Button
+                type="button"
+                variant="destructive"
+                onClick={() => setIsDeleteDialogOpen(true)}
+                disabled={isLoading}
+              >
+                Excluir Conta
+              </Button>
             </DialogFooter>
           </form>
         </DialogContent>

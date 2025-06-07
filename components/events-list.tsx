@@ -1,12 +1,12 @@
-"use client"
+"use client";
 
-import { useEffect, useState } from "react"
-import { format } from "date-fns"
-import { Event } from "@/lib/types"
-import { getAllEvents, deleteEvent, searchEvents } from "@/lib/api"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import Link from "next/link"
+import { useEffect, useState } from "react";
+import { format } from "date-fns";
+import { Event } from "@/lib/types";
+import { getAllEvents, deleteEvent, searchEvents } from "@/lib/api";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
 import {
   Calendar,
   MapPin,
@@ -14,7 +14,7 @@ import {
   Pencil,
   Trash2,
   Clock,
-} from "lucide-react"
+} from "lucide-react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -25,16 +25,16 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from "@/components/ui/alert-dialog"
-import { Skeleton } from "@/components/ui/skeleton"
-import { useToast } from "@/hooks/use-toast"
+} from "@/components/ui/alert-dialog";
+import { Skeleton } from "@/components/ui/skeleton";
+import { useToast } from "@/hooks/use-toast";
 
 interface EventsListProps {
-  searchTerm?: string
-  startDate?: string
-  endDate?: string
-  minPrice?: string
-  maxPrice?: string
+  searchTerm?: string;
+  startDate?: string;
+  endDate?: string;
+  minPrice?: string;
+  maxPrice?: string;
 }
 
 export function EventsList({
@@ -44,69 +44,70 @@ export function EventsList({
   minPrice,
   maxPrice,
 }: EventsListProps) {
-  const { toast } = useToast()
-  const [events, setEvents] = useState<Event[]>([])
-  const [isLoading, setIsLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+  const { toast } = useToast();
+  const [events, setEvents] = useState<Event[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    loadEvents()
-  }, [searchTerm, startDate, endDate, minPrice, maxPrice])
+    loadEvents();
+  }, [searchTerm, startDate, endDate, minPrice, maxPrice]);
 
   async function loadEvents() {
     try {
-      setIsLoading(true)
-      setError(null)
+      setIsLoading(true);
+      setError(null);
 
       // Verifica se há algum filtro ativo
       const hasFilters =
-        searchTerm || startDate || endDate || minPrice || maxPrice
+        searchTerm || startDate || endDate || minPrice || maxPrice;
 
       if (hasFilters) {
         // Se houver filtros, usa a busca com parâmetros
-        const params = new URLSearchParams()
+        const params = new URLSearchParams();
         searchTerm === undefined
           ? params.append("q", "undefined")
-          : params.append("q", searchTerm)
-        if (startDate) params.append("startDate", startDate)
-        if (endDate) params.append("endDate", endDate)
-        if (minPrice) params.append("minPrice", minPrice)
-        if (maxPrice) params.append("maxPrice", maxPrice)
+          : params.append("q", searchTerm);
+        if (startDate) params.append("startDate", startDate);
+        if (endDate) params.append("endDate", endDate);
+        if (minPrice) params.append("minPrice", minPrice);
+        if (maxPrice) params.append("maxPrice", maxPrice);
 
-        const { data } = await searchEvents(params.toString())
-        setEvents(Array.isArray(data) ? data : [])
+        const { data } = await searchEvents(params.toString());
+        setEvents(Array.isArray(data) ? data : []);
       } else {
         // Se não houver filtros, busca todos os eventos
-        const data = await getAllEvents()
-        setEvents(Array.isArray(data) ? data : [])
+        const data = await getAllEvents();
+
+        setEvents(Array.isArray(data) ? data : []);
       }
     } catch (error) {
-      console.error("Falha ao carregar eventos:", error)
-      setError("Falha ao carregar eventos. Por favor, tente novamente.")
-      setEvents([])
+      console.error("Falha ao carregar eventos:", error);
+      setError("Falha ao carregar eventos. Por favor, tente novamente.");
+      setEvents([]);
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
   }
 
   async function handleDelete(id: string) {
     try {
-      await deleteEvent(id)
-      await loadEvents()
+      await deleteEvent(id);
+      await loadEvents();
       toast({
-        title: "Success",
+        title: "Successo",
         description: "Evento deletado com sucesso!",
         className: "bg-red-700 text-white border-0",
         color: "red",
-      })
+      });
     } catch (error) {
-      console.error("Failed to delete event:", error)
+      console.error("Failed to delete event:", error);
       toast({
-        title: "Error",
+        title: "Erro",
         description: "Falha ao deletar o evento. Tente novamente.",
         className: "bg-red-500 text-white border-0",
         color: "red",
-      })
+      });
     }
   }
 
@@ -130,7 +131,7 @@ export function EventsList({
           </Card>
         ))}
       </div>
-    )
+    );
   }
 
   if (error) {
@@ -141,7 +142,7 @@ export function EventsList({
           Tente Novamente
         </Button>
       </div>
-    )
+    );
   }
 
   if (events.length === 0) {
@@ -156,7 +157,7 @@ export function EventsList({
           </Button>
         )}
       </div>
-    )
+    );
   }
 
   return (
@@ -248,5 +249,5 @@ export function EventsList({
         </Card>
       ))}
     </div>
-  )
+  );
 }

@@ -44,7 +44,6 @@ export default function Home() {
     }
 
     if (endDate != "") {
-      console.log("endDateTime", endDateTime);
       if (Date.parse(endDateTime) < Date.parse(startDateTime)) {
         toast({
           title: "Erro",

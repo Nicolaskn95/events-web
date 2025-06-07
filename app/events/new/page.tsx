@@ -1,28 +1,28 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { useRouter } from "next/navigation"
-import { EventForm } from "@/components/event-form"
-import { createEvent } from "@/lib/api"
-import { EventFormData } from "@/lib/types"
-import { useToast } from "@/hooks/use-toast"
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { EventForm } from "@/components/event-form";
+import { createEvent } from "@/lib/api";
+import { EventFormData } from "@/lib/types";
+import { useToast } from "@/hooks/use-toast";
 
 export default function NewEventPage() {
-  const router = useRouter()
-  const { toast } = useToast()
+  const router = useRouter();
+  const { toast } = useToast();
 
   async function handleSubmit(data: any) {
     try {
-      await createEvent(data)
+      await createEvent(data);
 
-      router.push("/")
+      router.push("/");
     } catch (err: any) {
-      console.error(err)
+      console.error(err);
 
       // Tratar erros de validação do backend
       if (err.errors && Array.isArray(err.errors)) {
         // Retornar os erros para o EventForm lidar com eles
-        return Promise.reject(err)
+        return Promise.reject(err);
       } else {
         // Toast para outros tipos de erro
         toast({
@@ -30,7 +30,7 @@ export default function NewEventPage() {
           description:
             err.message || "Falha ao criar evento. Por favor, tente novamente.",
           variant: "destructive",
-        })
+        });
       }
     }
   }
@@ -44,5 +44,5 @@ export default function NewEventPage() {
         <EventForm onSubmit={handleSubmit} onCancel={() => router.push("/")} />
       </div>
     </div>
-  )
+  );
 }

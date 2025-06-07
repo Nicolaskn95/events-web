@@ -1,14 +1,14 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
-import * as z from "zod"
-import { format } from "date-fns"
-import { CalendarIcon } from "lucide-react"
-import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
-import { Calendar } from "@/components/ui/calendar"
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+import { format } from "date-fns";
+import { CalendarIcon } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { Calendar } from "@/components/ui/calendar";
 import {
   Form,
   FormControl,
@@ -16,16 +16,16 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form"
-import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@/components/ui/popover"
-import { EventFormData } from "@/lib/types"
-import { useToast } from "@/hooks/use-toast"
+} from "@/components/ui/popover";
+import { EventFormData } from "@/lib/types";
+import { useToast } from "@/hooks/use-toast";
 
 const formSchema = z.object({
   title: z.string().min(3, "O título deve ter pelo menos 3 caracteres."),
@@ -44,21 +44,21 @@ const formSchema = z.object({
   description: z
     .string()
     .min(10, "A descrição deve ter pelo menos 10 caracteres."),
-})
+});
 
 interface EventFormProps {
-  initialData?: EventFormData
-  onSubmit: (data: EventFormData) => Promise<void>
-  onCancel: () => void
+  initialData?: EventFormData;
+  onSubmit: (data: EventFormData) => Promise<void>;
+  onCancel: () => void;
 }
 
 export function EventForm({ initialData, onSubmit, onCancel }: EventFormProps) {
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const { toast } = useToast()
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { toast } = useToast();
 
   const isValidDate = (date: any) => {
-    return date && !isNaN(new Date(date).getTime())
-  }
+    return date && !isNaN(new Date(date).getTime());
+  };
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -75,15 +75,15 @@ export function EventForm({ initialData, onSubmit, onCancel }: EventFormProps) {
           location: "",
           description: "",
         },
-  })
+  });
 
   async function handleSubmit(values: z.infer<typeof formSchema>) {
     try {
-      setIsSubmitting(true)
+      setIsSubmitting(true);
       const result = await onSubmit({
         ...values,
         date: values.date.toISOString().split(".")[0] + "Z",
-      })
+      });
 
       // Mostrar toast de sucesso
       toast({
@@ -94,7 +94,7 @@ export function EventForm({ initialData, onSubmit, onCancel }: EventFormProps) {
         className: initialData
           ? "bg-blue-400 text-white border-0"
           : "bg-green-700 text-white border-0",
-      })
+      });
     } catch (error) {
       // Mostrar toast de erro
       toast({
@@ -102,9 +102,9 @@ export function EventForm({ initialData, onSubmit, onCancel }: EventFormProps) {
         description:
           "Ocorreu um erro ao salvar o evento. Por favor, tente novamente.",
         variant: "destructive",
-      })
+      });
     } finally {
-      setIsSubmitting(false)
+      setIsSubmitting(false);
     }
   }
 
@@ -153,15 +153,19 @@ export function EventForm({ initialData, onSubmit, onCancel }: EventFormProps) {
                 <PopoverContent className="w-auto p-0" align="start">
                   <Calendar
                     mode="single"
-                    selected={field.value}
+                    selected={
+                      isValidDate(field.value)
+                        ? new Date(field.value)
+                        : new Date()
+                    }
                     onSelect={(date) => {
-                      const currentDate = field.value || new Date()
-                      const updatedDate = date ? new Date(date) : new Date()
+                      const currentDate = field.value || new Date();
+                      const updatedDate = date ? new Date(date) : new Date();
                       updatedDate.setHours(
                         currentDate.getHours(),
                         currentDate.getMinutes()
-                      )
-                      field.onChange(updatedDate)
+                      );
+                      field.onChange(updatedDate);
                     }}
                     disabled={(date) =>
                       date < new Date(new Date().setHours(0, 0, 0, 0))
@@ -171,14 +175,18 @@ export function EventForm({ initialData, onSubmit, onCancel }: EventFormProps) {
                   <div className="mt-2 flex items-center space-x-2">
                     <Input
                       type="time"
-                      value={format(new Date(field.value), "HH:mm")}
+                      value={
+                        isValidDate(field.value)
+                          ? format(new Date(field.value), "HH:mm")
+                          : format(new Date(), "HH:mm")
+                      }
                       onChange={(e) => {
                         const [hours, minutes] = e.target.value
                           .split(":")
-                          .map(Number)
-                        const updatedDate = new Date(field.value)
-                        updatedDate.setHours(hours, minutes)
-                        field.onChange(updatedDate)
+                          .map(Number);
+                        const updatedDate = new Date(field.value);
+                        updatedDate.setHours(hours, minutes);
+                        field.onChange(updatedDate);
                       }}
                     />
                   </div>
@@ -277,5 +285,5 @@ export function EventForm({ initialData, onSubmit, onCancel }: EventFormProps) {
         </div>
       </form>
     </Form>
-  )
+  );
 }

@@ -10,6 +10,7 @@ export interface ApiResponse {
 // Função para obter os headers com o token de autenticação
 const getAuthHeaders = () => {
   const token = Cookies.get("token");
+
   return {
     "Content-Type": "application/json",
     ...(token ? { access_token: token } : {}),
@@ -18,25 +19,27 @@ const getAuthHeaders = () => {
 
 export async function getAllEvents(): Promise<Event[]> {
   const response = await fetch(`${config.apiUrl}/api/events`, {
+    method: "GET",
     headers: getAuthHeaders(),
   });
   return response.json();
 }
 
 export async function getEventById(id: string): Promise<Event> {
-  const response = await fetch(`${config.apiUrl}/${id}`, {
+  const response = await fetch(`${config.apiUrl}/api/events/${id}`, {
+    method: "GET",
     headers: getAuthHeaders(),
   });
   return response.json();
 }
 
 export async function createEvent(event: EventFormData): Promise<Event> {
-  const response = await fetch(config.apiUrl, {
+  const response = await fetch(`${config.apiUrl}/api/events`, {
     method: "POST",
     headers: getAuthHeaders(),
     body: JSON.stringify(event),
   });
-  console.log(response);
+
   return response.json();
 }
 
@@ -44,7 +47,7 @@ export async function updateEvent(
   id: string,
   event: EventFormData
 ): Promise<Event> {
-  const response = await fetch(`${config.apiUrl}/${id}`, {
+  const response = await fetch(`${config.apiUrl}/api/events/${id}`, {
     method: "PUT",
     headers: getAuthHeaders(),
     body: JSON.stringify(event),
@@ -53,8 +56,7 @@ export async function updateEvent(
 }
 
 export async function deleteEvent(id: string): Promise<void> {
-  console.log(id);
-  await fetch(`${config.apiUrl}/${id}`, {
+  await fetch(`${config.apiUrl}/api/events/${id}`, {
     method: "DELETE",
     headers: getAuthHeaders(),
   });
@@ -62,11 +64,12 @@ export async function deleteEvent(id: string): Promise<void> {
 
 export async function searchEvents(query: string): Promise<ApiResponse> {
   const response = await fetch(
-    `${config.apiUrl}/search?q=${encodeURIComponent(query)}`,
+    `${config.apiUrl}/api/events/search?q=${encodeURIComponent(query)}`,
     {
+      method: "GET",
       headers: getAuthHeaders(),
     }
   );
-  console.log(response);
+
   return response.json();
 }
